@@ -1,0 +1,1 @@
+# shareholder-detail-ui
