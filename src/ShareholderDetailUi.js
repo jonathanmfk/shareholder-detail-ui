@@ -61,7 +61,7 @@ export class ShareholderDetailUi extends LitElement {
     this.titleName = data.name;
     if (this.isMember) {
       clipBox.icon = bbvaBuilding();
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         this.shadowRoot.querySelector('#selectDocumentType').value = data.selectDocumentType;
         this.shadowRoot.querySelector('#inputIdentificationNumber').value = data.inputIdentificationNumber;
         this.shadowRoot.querySelector('#inputParticipationPercentage').value = data.inputParticipationPercentage;
@@ -71,7 +71,7 @@ export class ShareholderDetailUi extends LitElement {
       clipBox.icon = null;
       clipBox.initials = this.getInicialLetters(data.name);
       const nameArray = data.name.split(' ');
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         this.shadowRoot.querySelector('#inputName').value = nameArray[0];
         this.shadowRoot.querySelector('#inputLastName').value = nameArray[1];
         this.shadowRoot.querySelector('#selectDocumentType').value = data.selectDocumentType;
