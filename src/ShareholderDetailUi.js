@@ -9,7 +9,7 @@ import '@bbva-web-components/bbva-web-form-radio-button/bbva-web-form-radio-butt
 import '@bbva-web-components/bbva-web-button-default/bbva-web-button-default.js';
 import '@bbva-web-components/bbva-web-clip-box/bbva-web-clip-box.js';
 import { bbvaBuilding, bbvaHelp } from '@bbva-web-components/bbva-foundations-icons/bbva-foundations-icons.js';
-import '@bbva-web-components/bbva-web-button-row/bbva-web-button-row-item.js'
+import '@bbva-web-components/bbva-web-button-row/bbva-web-button-row-item.js';
 
 /**
  * ![LitElement component](https://img.shields.io/badge/litElement-component-blue.svg)
@@ -27,6 +27,9 @@ export class ShareholderDetailUi extends LitElement {
     return {
       isMember: {
         type: Boolean
+      },
+      titleName: {
+        type: String
       }
     };
   }
@@ -34,14 +37,48 @@ export class ShareholderDetailUi extends LitElement {
   constructor() {
     super();
     this.isMember = false;
+    this.title = '';
   }
 
   static get styles() {
     return [ styles, getComponentSharedStyles('shareholder-detail-ui-shared-styles') ];
   }
 
-  onClickButtonHelp(e) {
-    this._fireEvent('on-click-button-help')
+  onClickButtonHelp() {
+    this._fireEvent('on-click-button-help');
+  }
+
+  getInicialLetters(name) {
+    const split = name.split(' ');
+    let inicials = '';
+    split.forEach((s) => (inicials += s.charAt(0).toUpperCase()));
+    return inicials;
+  }
+
+  setDataForm(data) {
+    const clipBox = this.shadowRoot.querySelector('#clip-box');
+    this.isMember = data.isMember;
+    this.titleName = data.name;
+    if (this.isMember) {
+      clipBox.icon = bbvaBuilding();
+      setTimeout(() => {
+        this.shadowRoot.querySelector('#selectDocumentType').value = data.selectDocumentType;
+        this.shadowRoot.querySelector('#inputIdentificationNumber').value = data.inputIdentificationNumber;
+        this.shadowRoot.querySelector('#inputParticipationPercentage').value = data.inputParticipationPercentage;
+        this.shadowRoot.querySelector('#inputBusinessName').value = data.name;
+      }, 100);
+    } else {
+      clipBox.icon = null;
+      clipBox.initials = this.getInicialLetters(data.name);
+      const nameArray = data.name.split(' ');
+      setTimeout(() => {
+        this.shadowRoot.querySelector('#inputName').value = nameArray[0];
+        this.shadowRoot.querySelector('#inputLastName').value = nameArray[1];
+        this.shadowRoot.querySelector('#selectDocumentType').value = data.selectDocumentType;
+        this.shadowRoot.querySelector('#inputIdentificationNumber').value = data.inputIdentificationNumber;
+        this.shadowRoot.querySelector('#inputParticipationPercentage').value = data.inputParticipationPercentage;
+      }, 100);
+    }
   }
 
   /**
@@ -55,13 +92,13 @@ export class ShareholderDetailUi extends LitElement {
 
   render() {
     return html`
+      ${this._profile}
       ${this.isMember ? this._memberFormRender : this._shareholderFormRender}
     `;
   }
 
   get _memberFormRender() {
     return html`
-    ${this._profileMember}
     ${this._infoText}
     ${this._selectDocumentType}
     ${this._inputIdentificationNumber}
@@ -74,7 +111,6 @@ export class ShareholderDetailUi extends LitElement {
 
   get _shareholderFormRender() {
     return html`
-    ${this._profileShareholder}
     ${this._infoText}
     ${this._selectDocumentType}
     ${this._inputIdentificationNumber}
@@ -86,27 +122,11 @@ export class ShareholderDetailUi extends LitElement {
     `;
   }
 
-  getInicialLetters(name) {
-    const split = name.split(' ');
-    let inicials = '';
-    split.forEach((s) => (inicials += s.charAt(0).toUpperCase()));
-    return inicials;
-  }
-
-  get _profileMember() {
+  get _profile() {
     return html`
     <div class="container">
-      <bbva-web-clip-box id="clip-box" size="m" icon="${bbvaBuilding()}" label="building" variant="aqua"></bbva-web-clip-box>
-      <p>Javier Sánchez</p>
-    </div>
-    `;
-  }
-
-  get _profileShareholder() {
-    return html`
-    <div class="container">
-      <bbva-web-clip-box id="clip-box" size="m" initials="" label="Javier Sánchez" variant="aqua"></bbva-web-clip-box>
-      <p>Javier Sánchez</p>
+      <bbva-web-clip-box id="clip-box" size="m" icon="" initials="" label="building" variant="aqua"></bbva-web-clip-box>
+      <p id="p-title">${this.titleName}</p>
     </div>
     `;
   }
@@ -120,8 +140,8 @@ export class ShareholderDetailUi extends LitElement {
   get _selectDocumentType() {
     return html`
     <bbva-web-form-select id="selectDocumentType" label="Tipo de Documento">
-      <bbva-web-form-option value"CC">Cédula de ciudadanía</bbva-web-form-option>
-      <bbva-web-form-option value"NIT">NIT</bbva-web-form-option>
+      <bbva-web-form-option value="CC">Cédula de ciudadanía</bbva-web-form-option>
+      <bbva-web-form-option value="NIT">NIT</bbva-web-form-option>
     </bbva-web-form-select>
     `;
   }
@@ -171,7 +191,8 @@ export class ShareholderDetailUi extends LitElement {
       <h5 class="color-gray">PERSONAS EXPUESTAS POLÍTICAMENTE (PEP)</h5>
       <div class="d-flex">
         <p><b>¿Es una Persona Expuesta políticamente (PEP), está relacionada, asociada o es familiar de una?</b></p>
-        <bbva-web-button-row-item icon="${bbvaHelp()}" @item-row-click="${this.onClickButtonHelp}"></bbva-web-button-row-item>
+        <bbva-web-button-row-item icon="${bbvaHelp()}" @item-row-click="${this
+      .onClickButtonHelp}"></bbva-web-button-row-item>
       </div>
 
       <div role="radiogroup" class="d-flex mb-2">
@@ -182,7 +203,10 @@ export class ShareholderDetailUi extends LitElement {
   }
 
   get _subTitleMemberList() {
-    return html`<h5>COMPOSICIÓN DEL ACCIONISTA</h5>`;
+    return html`
+    <h5>COMPOSICIÓN DEL ACCIONISTA</h5>
+    <slot name="list"></slot>
+    `;
   }
 
   get _exitButton() {
