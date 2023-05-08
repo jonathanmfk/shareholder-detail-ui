@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit-element';
+import { bbvaBuilding, bbvaHelp } from '@bbva-web-components/bbva-foundations-icons/bbva-foundations-icons.js';
 import { getComponentSharedStyles } from '@bbva-web-components/bbva-core-lit-helpers';
 import styles from './shareholder-detail-ui.css.js';
 
@@ -8,7 +9,6 @@ import '@bbva-web-components/bbva-web-form-text/bbva-web-form-text.js';
 import '@bbva-web-components/bbva-web-form-radio-button/bbva-web-form-radio-button.js';
 import '@bbva-web-components/bbva-web-button-default/bbva-web-button-default.js';
 import '@bbva-web-components/bbva-web-clip-box/bbva-web-clip-box.js';
-import { bbvaBuilding, bbvaHelp } from '@bbva-web-components/bbva-foundations-icons/bbva-foundations-icons.js';
 import '@bbva-web-components/bbva-web-button-row/bbva-web-button-row-item.js';
 
 /**
@@ -51,7 +51,9 @@ export class ShareholderDetailUi extends LitElement {
   getInicialLetters(name) {
     const split = name.split(' ');
     let inicials = '';
-    split.forEach((s) => (inicials += s.charAt(0).toUpperCase()));
+    for (let i = 0; i < split.length; i += 1) {
+      inicials += split[i].charAt(0).toUpperCase();
+    }
     return inicials;
   }
 
@@ -70,10 +72,10 @@ export class ShareholderDetailUi extends LitElement {
     } else {
       clipBox.icon = null;
       clipBox.initials = this.getInicialLetters(data.name);
-      const nameArray = data.name.split(' ');
+      const [ name, lastName ] = data.name.split(' ');
       requestAnimationFrame(() => {
-        this.shadowRoot.querySelector('#inputName').value = nameArray[0];
-        this.shadowRoot.querySelector('#inputLastName').value = nameArray[1];
+        this.shadowRoot.querySelector('#inputName').value = name;
+        this.shadowRoot.querySelector('#inputLastName').value = lastName;
         this.shadowRoot.querySelector('#selectDocumentType').value = data.selectDocumentType;
         this.shadowRoot.querySelector('#inputIdentificationNumber').value = data.inputIdentificationNumber;
         this.shadowRoot.querySelector('#inputParticipationPercentage').value = data.inputParticipationPercentage;
@@ -87,7 +89,7 @@ export class ShareholderDetailUi extends LitElement {
    * @param {Object} detail
    */
   _fireEvent(nameEvent, detail = {}) {
-    this.dispatchEvent(new CustomEvent(nameEvent, { bubbles: true, composed: true, detail: detail }));
+    this.dispatchEvent(new CustomEvent(nameEvent, { bubbles: true, composed: true, detail }));
   }
 
   render() {
